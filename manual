@@ -24,7 +24,7 @@ right = 0
 faster = 0
 slower = 0
 
-for _ in range(15):
+for _ in range(30):
     action = env.action_type.actions_indexes["IDLE"]
     obs, reward, done, truncated, info = env.step(action)
 
