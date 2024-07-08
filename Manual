@@ -1,0 +1,53 @@
+import random
+import gymnasium as gym
+import pprint
+from matplotlib import pyplot as plt
+#%matplotlib inline
+
+env = gym.make("highway-v0", render_mode='rgb_array')
+pprint.pprint(env.config)
+
+env.config["lanes_count"] = 5
+env.config["screen_height"] = 200
+env.config["vehicles_count"] = 100
+env.config["duration"] = 60
+env.reset()
+
+average_speed = 0
+collision_free_speed = 0
+cycles = 0
+collision_free_cycles = 0
+collisions = 0
+distance = 0
+left = 0
+right = 0
+faster = 0
+slower = 0
+
+for _ in range(15):
+    action = env.action_type.actions_indexes["IDLE"]
+    obs, reward, done, truncated, info = env.step(action)
+
+    env.render()
+    average_speed += env.vehicle.speed
+
+    if not env.vehicle.crashed:
+        collision_free_speed += env.vehicle.speed
+        collision_free_cycles += 1
+    else:
+        collisions += 1
+
+    distance += reward
+    cycles += 1
+
+plt.imshow(env.render())
+#plt.show()
+
+average_speed /= cycles
+print("Average Speed: " + str(round(average_speed, 2)))
+
+collision_free_speed /= collision_free_cycles
+print("Average Collision-Free Speed: " + str(round(collision_free_speed, 2)))
+
+collisions /= (distance / 1000)
+print("Collisions Per 1000 Meters: " + str(int(collisions)))
