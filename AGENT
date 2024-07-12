@@ -3,6 +3,16 @@ import gymnasium as gym
 from stable_baselines3 import DQN
 #%matplotlib inline
 
+config = {
+    "lanes_count": 4,
+    "vehicles_count": 50,
+    "duration": 100,  # [s]
+    "initial_spacing": 2,
+    "simulation_frequency": 15,  # [Hz]
+    "policy_frequency": 0.25,  # [Hz]
+    "render_agent": True,
+}
+
 env = gym.make("highway-fast-v0", render_mode='rgb_array')
 model = DQN('MlpPolicy', env,
               policy_kwargs=dict(net_arch=[256, 256]),
