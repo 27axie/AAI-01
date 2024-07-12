@@ -1,5 +1,5 @@
-import random
 import gymnasium as gym
+import highway_env
 from stable_baselines3 import DQN
 #%matplotlib inline
 
