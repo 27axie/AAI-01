@@ -1,0 +1,92 @@
+import numpy as np
+import gymnasium as gym
+import highway_env
+
+env = gym.make("highway-fast-v0", render_mode = "rgb_array")
+config = {
+    "lanes_count": 4,
+    "vehicles_count": 50,
+    "duration": 100,  # [s]
+    "initial_spacing": 2,
+    "simulation_frequency": 15,  # [Hz]
+    "policy_frequency": 0.25,  # [Hz]
+    "render_agent": True,
+    "observation": {
+        "type": "OccupancyGrid",
+        "vehicles_count": 50,
+        "features": ["presence", "x", "y", "vx", "vy", "cos_h", "sin_h"],
+        "features_range": {
+            "x": [-100, 100],
+            "y": [-100, 100],
+            "vx": [-20, 20],
+            "vy": [-20, 20]
+        },
+        "grid_size": [[-57.5, 57.5], [-57.5, 57.5]],
+        "grid_step": [5, 5],
+        "absolute": False
+    }
+}
+env.reset()
+
+average_speed = 0
+collision_free_speed = 0
+cycles = 0
+collision_free_cycles = 0
+collisions = 0
+distance = 0
+
+env.unwrapped.configure(config)
+done = truncated = False
+obs, info = env.reset()
+
+def selected_action():
+    available = env.get_available_actions()
+    carInFront = np.any(front_slice)
+    carOnLeft = np.any(left_slice)
+    carOnRight = np.any(right_slice)
+
+    print("car in front: " + str(carInFront))
+    print("car on left: " + str(carOnLeft))
+    print("car on right: " + str(carOnRight))
+
+    if not carInFront:
+        return 3
+    elif (carInFront and 2 not in available) or (carInFront and carOnRight and not carOnLeft):
+        return 0
+    elif (carInFront and 0 not in available) or (carInFront and carOnLeft and not carOnRight):
+        return 2
+    else:
+        return 4
+
+while not (done or truncated):
+    presence = obs[0, ...]
+    print("presence array: \n" + str(presence))
+
+    front_slice = presence[11:12, 12:23]
+    left_slice = presence[10:11, 9:15]
+    right_slice = presence[12:13, 9:15]
+
+    action = selected_action()
+    obs, reward, done, truncated, info = env.step(action)
+
+    env.render()
+
+    average_speed += env.vehicle.speed
+
+    if not env.vehicle.crashed:
+        collision_free_speed += env.vehicle.speed
+        collision_free_cycles += 1
+    else:
+        collisions += 1
+
+    distance += reward
+    cycles += 1
+
+average_speed /= cycles
+print("Average Speed: " + str(round(average_speed, 2)))
+
+collision_free_speed /= collision_free_cycles
+print("Average Collision-Free Speed: " + str(round(collision_free_speed, 2)))
+
+collisions /= (distance / 1000)
+print("Collisions Per 1000 Meters: " + str(int(collisions)))
