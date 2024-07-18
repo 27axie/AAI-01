@@ -2,7 +2,7 @@ import numpy as np
 import gymnasium as gym
 import highway_env
 
-env = gym.make("highway-fast-v0", render_mode = "rgb_array")
+env = gym.make("highway-v0", render_mode = "rgb_array")
 config = {
     "lanes_count": 4,
     "vehicles_count": 50,
@@ -18,7 +18,7 @@ config = {
         "features_range": {
             "x": [-100, 100],
             "y": [-100, 100],
-            "vx": [-20, 20],
+            "vx": [-100, 20],
             "vy": [-20, 20]
         },
         "grid_size": [[-57.5, 57.5], [-57.5, 57.5]],
@@ -48,25 +48,30 @@ def selected_action():
     print("car in front: " + str(carInFront))
     print("car on left: " + str(carOnLeft))
     print("car on right: " + str(carOnRight))
+    print(available)
 
     if not carInFront:
         return 3
-    elif (carInFront and 2 not in available) or (carInFront and carOnRight and not carOnLeft):
-        return 0
-    elif (carInFront and 0 not in available) or (carInFront and carOnLeft and not carOnRight):
-        return 2
     else:
-        return 4
+        if (0 not in available and carOnRight) or (2 not in available and carOnLeft):
+            return 4
+        elif not carOnLeft:
+            return 0
+        elif not carOnRight:
+            return 2
+        else:
+            return 4
 
 while not (done or truncated):
     presence = obs[0, ...]
     print("presence array: \n" + str(presence))
 
     front_slice = presence[11:12, 12:23]
-    left_slice = presence[10:11, 9:15]
-    right_slice = presence[12:13, 9:15]
+    left_slice = presence[10:11, 6:18]
+    right_slice = presence[12:13, 6:18]
 
     action = selected_action()
+    print(action)
     obs, reward, done, truncated, info = env.step(action)
 
     env.render()
