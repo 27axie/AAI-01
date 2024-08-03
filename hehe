@@ -117,19 +117,6 @@ print(curr_a)
 print(next_y, next_x)
 
 available_actions = check_available(available_actions, curr_x, curr_y)
-max_q = 0
-
-if 'left' in available_actions:
-    max_q = max(max_q, array[curr_x - 1][curr_y])
-
-if 'right' in available_actions:
-    max_q = max(max_q, array[curr_x + 1][curr_y])
-
-if 'up' in available_actions:
-    max_q = max(max_q, array[curr_x][curr_y - 1])
-
-if 'down' in available_actions:
-    max_q = max(max_q, array[curr_x][curr_y + 1])
 
 #array[curr_x][curr_y] += learning_rate * ()
 curr_x = next_x
