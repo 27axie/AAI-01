@@ -1,0 +1,130 @@
+import random
+
+array = []
+
+for i in range(10):
+    l = []
+
+    for j in range(10):
+        n = random.randint(1, 9)
+        if n == 9:
+            l.append(1)
+        else:
+            l.append(0)
+
+    array.append(l)
+
+array[0][0] = 0
+array[9][9] = 2
+
+for i in range(10):
+  print(array[i])
+
+# * * * * *
+
+table = []
+l = []
+actions = ['up', 'down', 'left', 'right']
+
+print(" ↑  ↓  ←  →")
+
+for i in range(100):
+    l = []
+
+    for j in range(4):
+        l.append(0)
+
+    table.append(l)
+
+for i in range(100):
+    print(table[i])
+
+curr_s = (1, 1)
+curr_a = '-'
+learning_rate = 0.003
+gamma = 0.9
+epsilon = 0.1
+curr_x = 1
+curr_y = 1
+available_actions = ['up', 'down', 'left', 'right']
+
+def check_available(available_actions, curr_x, curr_y):
+    available_actions = ['up', 'down', 'left', 'right']
+
+    if curr_x == 1:
+        available_actions.pop(2)
+    if curr_y == 1:
+        available_actions.pop(0)
+    if curr_x == 10:
+        available_actions.pop(3)
+    if curr_y == 10:
+        available_actions.pop(1)
+
+    return available_actions
+def epsilon_greedy(available_actions):
+    available_actions = check_available(available_actions, curr_x, curr_y)
+    print(available_actions)
+
+    if random.random() < epsilon:
+         return random.choice(available_actions)
+    else:
+        new_actions = []
+
+        if 'left' in available_actions:
+            if array[curr_x - 1][curr_y] != 1:
+                new_actions.append('left')
+
+        if 'right' in available_actions:
+            if array[curr_x + 1][curr_y] != 1:
+                new_actions.append('right')
+
+        if 'up' in available_actions:
+            if array[curr_x - 1][curr_y + 1] != 1:
+                new_actions.append('up')
+
+        if 'down' in available_actions:
+            if array[curr_x + 1][curr_y + 1] != 1:
+                new_actions.append('down')
+
+        return random.choice(new_actions)
+
+#print(epsilon_greedy(available_actions))
+curr_a = epsilon_greedy(available_actions)
+next_x = 1
+next_y = 1
+
+if curr_a == 'left':
+    next_x = curr_x - 1
+
+elif curr_a == 'right':
+    next_x = curr_x + 1
+
+elif curr_a == 'up':
+    next_y = curr_y - 1
+
+elif curr_a == 'down':
+    next_y = curr_y + 1
+
+print(curr_a)
+print(next_x, next_y)
+
+available_actions = check_available(available_actions, curr_x, curr_y)
+
+if 'left' in available_actions:
+    if array[curr_x - 1][curr_y] != 1:
+        new_actions.append('left')
+
+if 'right' in available_actions:
+    if array[curr_x + 1][curr_y] != 1:
+        new_actions.append('right')
+
+if 'up' in available_actions:
+    if array[curr_x - 1][curr_y + 1] != 1:
+        new_actions.append('up')
+
+if 'down' in available_actions:
+    if array[curr_x + 1][curr_y + 1] != 1:
+        new_actions.append('down')
+        
+curr_x = next_x
+curr_y = next_y
